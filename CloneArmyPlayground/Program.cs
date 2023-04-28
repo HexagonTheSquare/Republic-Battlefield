@@ -6,29 +6,27 @@ namespace CloneArmyPlayground
     {
         public static void Main(string[] args)
         {
-            Corps reconCorps = GenerateCorps("91st Recon Corps");
+            Program program = new Program();
 
-            Console.WriteLine($"91st Recon Corps Manpower: {reconCorps.Manpower}");
-            Console.WriteLine($"91st Recon Corps Average Skill: {(int)reconCorps.ArmySkill}");
-            Console.WriteLine($"91st Recon Corps Average Morale: {(int)reconCorps.ArmyMorale}");
-            Console.WriteLine($"91st Recon Corps Average Discipline: {(int)reconCorps.ArmyDiscipline}");
-
-            foreach (var battalion in reconCorps.Subdivisions)
+            bool x0 = true;
+            while (x0)
             {
-                Console.WriteLine(battalion.Name);
-                foreach (var company in battalion.Subdivisions)
+                string command = (string)Console.ReadLine();
+
+                switch (command.ToLower())
                 {
-                    //Console.WriteLine(company.Name);
-                    foreach (var platoon in company.Subdivisions)
-                    {
-                        foreach (var squad in platoon.Subdivisions)
-                        {
-                            //
-                        }
-                    }
+                    case "help":
+                        Console.WriteLine("begin\nexit\nhelp");
+                        break;
+                    case "exit":
+                        x0 = false;
+                        break;
+                    case "begin":
+                        program.CorpsConfiguration();
+                        break;
                 }
+
             }
-            Console.ReadLine();
         }
 
 
@@ -80,6 +78,36 @@ namespace CloneArmyPlayground
                                 for (int l = 1; l <= 4; l++)
                                 {
                                     // Set specific values for skill, morale, and discipline
+                                    double skill = RandomNumberGeneratorUtil.Next(0, 100) * RandomNumberGeneratorUtil.NextFloat(0.75f, 1);
+                                    double morale = RandomNumberGeneratorUtil.Next(0, 100) * RandomNumberGeneratorUtil.NextFloat(0.75f, 1);
+                                    double discipline = RandomNumberGeneratorUtil.Next(0, 100) * RandomNumberGeneratorUtil.NextFloat(0.75f, 1);
+
+                                    Squad squad = new Squad($"{l}{GetOrdinalSuffix(l)} Squad", 9, skill, morale, discipline);
+                                    platoon.AddSubdivision(squad);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "seperatist":
+                    for (int i = 1; i <= 96; i++)
+                    {
+                        Battalion battalion = new Battalion($"{i}{GetOrdinalSuffix(i)} Confederate Battalion");
+                        corps.AddSubdivision(battalion);
+
+                        for (int j = 1; j <= 7; j++)
+                        {
+                            Company company = new Company($"{j}{GetOrdinalSuffix(j)} Company");
+                            battalion.AddSubdivision(company);
+
+                            for (int k = 1; k <= 2; k++)
+                            {
+                                Platoon platoon = new Platoon($"{k}{GetOrdinalSuffix(k)} Platoon");
+                                company.AddSubdivision(platoon);
+
+                                for (int l = 1; l <= 7; l++)
+                                {
+                                    // Set specific values for skill, morale, and discipline
                                     double skill = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
                                     double morale = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
                                     double discipline = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
@@ -91,39 +119,31 @@ namespace CloneArmyPlayground
                         }
                     }
                     break;
-                case "seperatist":
-                    for (int i = 1; i <= 64; i++)
-                    {
-                        Battalion battalion = new Battalion($"{i}{GetOrdinalSuffix(i)} Battalion");
-                        corps.AddSubdivision(battalion);
-
-                        for (int j = 1; j <= 4; j++)
-                        {
-                            Company company = new Company($"{j}{GetOrdinalSuffix(j)} Company");
-                            battalion.AddSubdivision(company);
-
-                            for (int k = 1; k <= 4; k++)
-                            {
-                                Platoon platoon = new Platoon($"{k}{GetOrdinalSuffix(k)} Platoon");
-                                company.AddSubdivision(platoon);
-
-                                for (int l = 1; l <= 4; l++)
-                                {
-                                    // Set specific values for skill, morale, and discipline
-                                    double skill = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
-                                    double morale = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
-                                    double discipline = RandomNumberGeneratorUtil.Next(0, 100) / RandomNumberGeneratorUtil.Next(1, 5);
-
-                                    Squad squad = new Squad($"{l}{GetOrdinalSuffix(l)} Squad", 8, skill, morale, discipline);
-                                    platoon.AddSubdivision(squad);
-                                }
-                            }
-                        }
-                    }
-                    break;
             }
             
             return corps;
+        }
+
+        public void CorpsConfiguration()
+        {
+            Console.WriteLine("Welcome, General!");
+            Console.Write("What's the name of your Corps? ");
+            string name = Console.ReadLine();
+
+            Corps userCorps = GenerateCorps(name, "republic");
+
+            Console.Write("What's the name of the enemy Corps? ");
+            name = Console.ReadLine();
+
+            Corps enemyCorps = GenerateCorps(name, "seperatist");
+
+            Console.WriteLine("Your corps, the {0}, currently has {1} men.", userCorps.Name, userCorps.Manpower);
+            Console.WriteLine("The enemy corps, the {0}, currently has {1} men.", enemyCorps.Name, enemyCorps.Manpower);
+
+            foreach (var battalion in userCorps.Subdivisions)
+            {
+                Console.WriteLine(battalion.Name);
+            }
         }
 
 
