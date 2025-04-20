@@ -72,7 +72,13 @@ namespace CloneArmyPlayground
                         Corps[] corps = CorpsConfig.CorpsConfiguration();
                         userCorps = corps[0];
                         enemyCorps = corps[1];
+
+                        // Begin inspection phase
+                        var inspector = new CorpsInspector(userCorps, enemyCorps);
+                        inspector.Start();
+
                         currentPhase = new BattlePhase(BattleStage.PreBattle, 0);
+
                         break;
                     case BattleStage.PreBattle:
                         preBattle.Execute(currentPhase, userCorps, enemyCorps, this);
@@ -89,7 +95,6 @@ namespace CloneArmyPlayground
                     case BattleStage.PostBattle:
                         postBattle.Execute(currentPhase, userCorps, enemyCorps, this);
 
-                        // Check if the war is over
                         warIsOver = CheckIfWarIsOver();
                         if (!warIsOver)
                         {
@@ -108,8 +113,7 @@ namespace CloneArmyPlayground
 
         private bool CheckIfWarIsOver()
         {
-            // Implement your logic to check if the war is over
-            // For example purposes, let's assume the war is over after one iteration
+            // TODO
             return (currentPhase.Stage == BattleStage.PostBattle && currentPhase.SubStage == 2);
         }
     }
@@ -119,12 +123,10 @@ namespace CloneArmyPlayground
         public void Execute(BattlePhase currentPhase, Corps userCorps, Corps enemyCorps, Operation operation)
         {
             
-            // Execute the 3 substages
             switch (currentPhase.SubStage)
             {
                 case 0:
-                    // Intelligence gathering and scouting
-                    // Modify morale based on scouting results
+                    // TODO
 
                     Console.WriteLine("The Nth Battle of [PLANET] has begun, both sides are conducting pre-battle preparations.");
 
@@ -135,13 +137,13 @@ namespace CloneArmyPlayground
                     var platoon = company.Subdivisions[Util.Next(0, company.Subdivisions.Count)];
                     Squad activeSquad = (Squad)platoon.Subdivisions[Util.Next(0, platoon.Subdivisions.Count)];
 
-                    Console.WriteLine("{2} {0}, {1} is assigned to scout the enemy forces, they have {3} troopers.", activeSquad.Name, battalion.Name, company.Name.Split(' ')[0], activeSquad.Manpower); //Placeholder flavour text
+                    Console.WriteLine("{2} {0}, {1} is assigned to scout the enemy forces, they have {3} troopers.", activeSquad.Name, battalion.Name, company.Name.Split(' ')[0], activeSquad.Manpower); //Placeholder
 
                     switch (Util.NextFloat(0, 1))
                     {
                         case var num when num * activeSquad.ArmySkill >= 75:
 
-                            //Very good outcome, import flavour text
+                            //Very good outcome
 
                             operation.Intelligence += 2;
 
@@ -149,7 +151,7 @@ namespace CloneArmyPlayground
                             break;
                         case var num when num * activeSquad.ArmySkill >= 50 && num * activeSquad.ArmySkill < 75:
 
-                            //Good outcome, import flavour text
+                            //Good outcome
 
                             operation.Intelligence += 1;
 
@@ -157,23 +159,23 @@ namespace CloneArmyPlayground
                             break;
                         case var num when num * activeSquad.ArmySkill >= 25 && num * activeSquad.ArmySkill < 50:
 
-                            //Bad outcome, import flavour text
+                            //Bad outcome
 
 
                             var casualties = Util.Next(0, Math.Max(0, ((activeSquad.Manpower / 2) * (int)(100 - activeSquad.ArmySkill))/100));
                             operation.Intelligence -= 1;
-                            activeSquad.UpdateManpower(activeSquad.Manpower - casualties);
+                            //activeSquad.UpdateManpower(activeSquad.Manpower - casualties);
 
                             Console.WriteLine("The mission goes poorly and {0} receive {1} casualt{2}.", activeSquad.Name, casualties, Util.GetPluralSuffix(casualties));
                             break;
                         case var num when num * activeSquad.ArmySkill >= 0 && num * activeSquad.ArmySkill < 25:
 
-                            //Very bad outcome, import flavour text
+                            //Very bad outcome
 
 
                             var casualtiesMajor = Util.Next(0, Math.Max(0, ((activeSquad.Manpower) * (int)(100 - activeSquad.ArmySkill)) / 100));
                             operation.Intelligence -= 2;
-                            activeSquad.UpdateManpower(activeSquad.Manpower - casualtiesMajor);
+                            //activeSquad.UpdateManpower(activeSquad.Manpower - casualtiesMajor);
 
                             Console.WriteLine("The mission goes very poorly and {0} receive {1} casualt{2}.", activeSquad.Name, casualtiesMajor, Util.GetPluralSuffix(casualtiesMajor));
                             break;
@@ -197,7 +199,6 @@ namespace CloneArmyPlayground
                     currentPhase.NextSubStage();
                     break;
                 default:
-                    // Move to the next stage
                     currentPhase.Stage = BattleStage.InitialEngagement;
                     currentPhase.SubStage = 0;
                     break;
@@ -240,14 +241,14 @@ namespace CloneArmyPlayground
                     {
                         case var num when num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill))*2 >= 75:
 
-                            //Very good outcome, import flavour text
+                            //Very good outcome
 
                             foreach(Squad squad in engagedUserPlatoon.Subdivisions)
                             {
                                 uCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower / 4) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalUCasualties += uCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - uCasualties);
+                                //squad.UpdateManpower(squad.Manpower - uCasualties);
                             }
 
                             foreach(Squad squad in engagedEnemyPlatoon.Subdivisions)
@@ -255,21 +256,21 @@ namespace CloneArmyPlayground
                                 eCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalECasualties += eCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - eCasualties);
+                                //squad.UpdateManpower(squad.Manpower - eCasualties);
                             }
 
                             Console.WriteLine("Your platoon receives {0} casualt{1} and are now at {2} troopers. The enemy platoon receives {3} casualt{4} and are now at {5} droids.", totalUCasualties, Util.GetPluralSuffix(totalUCasualties), engagedUserPlatoon.Manpower, totalECasualties, Util.GetPluralSuffix(totalECasualties), engagedEnemyPlatoon.Manpower);
                             break;
                         case var num when num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 >= 50 && num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 < 75:
 
-                            //Good outcome, import flavour text
+                            //Good outcome
 
                             foreach (Squad squad in engagedUserPlatoon.Subdivisions)
                             {
                                 uCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower / 3) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalUCasualties += uCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - uCasualties);
+                                //squad.UpdateManpower(squad.Manpower - uCasualties);
                             }
 
                             foreach (Squad squad in engagedEnemyPlatoon.Subdivisions)
@@ -277,14 +278,14 @@ namespace CloneArmyPlayground
                                 eCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower/2) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalECasualties += eCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - eCasualties);
+                                //squad.UpdateManpower(squad.Manpower - eCasualties);
                             }
 
                             Console.WriteLine("Your platoon receives {0} casualt{1} and are now at {2} troopers. The enemy platoon receives {3} casualt{4} and are now at {5} droids.", totalUCasualties, Util.GetPluralSuffix(totalUCasualties), engagedUserPlatoon.Manpower, totalECasualties, Util.GetPluralSuffix(totalECasualties), engagedEnemyPlatoon.Manpower);
                             break;
                         case var num when num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 >= 25 && num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 < 50:
 
-                            //Bad outcome, import flavour text
+                            //Bad outcome
 
 
                             foreach (Squad squad in engagedUserPlatoon.Subdivisions)
@@ -292,7 +293,7 @@ namespace CloneArmyPlayground
                                 uCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower / 2) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalUCasualties += uCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - uCasualties);
+                                //squad.UpdateManpower(squad.Manpower - uCasualties);
                             }
 
                             foreach (Squad squad in engagedEnemyPlatoon.Subdivisions)
@@ -300,14 +301,14 @@ namespace CloneArmyPlayground
                                 eCasualties = Util.Next(0, Math.Max(1, ((squad.Manpower/3) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalECasualties += eCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - eCasualties);
+                                //squad.UpdateManpower(squad.Manpower - eCasualties);
                             }
 
                             Console.WriteLine("Your platoon receives {0} casualt{1} and are now at {2} troopers. The enemy platoon receives {3} casualt{4} and are now at {5} droids.", totalUCasualties, Util.GetPluralSuffix(totalUCasualties), engagedUserPlatoon.Manpower, totalECasualties, Util.GetPluralSuffix(totalECasualties), engagedEnemyPlatoon.Manpower);
                             break;
                         case var num when num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 >= 0 && num * Math.Max(1, (engagedUserPlatoon.ArmySkill - engagedEnemyPlatoon.ArmySkill)) * 2 < 25:
 
-                            //Very bad outcome, import flavour text
+                            //Very bad outcome
 
 
                             foreach (Squad squad in engagedUserPlatoon.Subdivisions)
@@ -315,7 +316,7 @@ namespace CloneArmyPlayground
                                 uCasualties = Util.Next(0, Math.Max(0, ((squad.Manpower) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalUCasualties += uCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - uCasualties);
+                                //squad.UpdateManpower(squad.Manpower - uCasualties);
                             }
 
                             foreach (Squad squad in engagedEnemyPlatoon.Subdivisions)
@@ -323,7 +324,7 @@ namespace CloneArmyPlayground
                                 eCasualties = Util.Next(0, Math.Max(0, ((squad.Manpower / 4) * (int)(100 - squad.ArmySkill)) / 100));
                                 totalECasualties += eCasualties;
 
-                                squad.UpdateManpower(squad.Manpower - eCasualties);
+                                //squad.UpdateManpower(squad.Manpower - eCasualties);
                             }
 
                             Console.WriteLine("Your platoon receives {0} casualt{1} and are now at {2} troopers. The enemy platoon receives {3} casualt{4} and are now at {5} droids.", totalUCasualties, Util.GetPluralSuffix(totalUCasualties), engagedUserPlatoon.Manpower, totalECasualties, Util.GetPluralSuffix(totalECasualties), engagedEnemyPlatoon.Manpower);
@@ -333,13 +334,11 @@ namespace CloneArmyPlayground
                     currentPhase.NextSubStage();
                     break;
                 case 1:
-                    // Artillery bombardment (if applicable)
-                    // Apply casualties based on artillery strength
+                    // Artillery bombardment
                     currentPhase.NextSubStage();
                     break;
                 case 2:
-                    // Air or space superiority (in Star Wars context)
-                    // Apply modifiers based on air/space superiority
+                    // Air or space superiority 
                     currentPhase.NextSubStage();
                     break;
                 default:
@@ -357,7 +356,6 @@ namespace CloneArmyPlayground
         {
             Console.WriteLine("Main Engagement");
             Console.WriteLine(currentPhase.SubStage);
-            // Execute the 4 substages
             switch (currentPhase.SubStage)
             {
                 case 0:
@@ -381,7 +379,6 @@ namespace CloneArmyPlayground
                     currentPhase.NextSubStage();
                     break;
                 default:
-                    // Move to the next stage
                     currentPhase.Stage = BattleStage.Climax;
                     currentPhase.SubStage = 0;
                     break;
@@ -439,7 +436,6 @@ namespace CloneArmyPlayground
         {
             Console.WriteLine("Post-Battle");
             Console.WriteLine(currentPhase.SubStage);
-            // Execute the 2 substages
             switch (currentPhase.SubStage)
             {
                 case 0:
@@ -454,8 +450,6 @@ namespace CloneArmyPlayground
                     break;
                 case 1:
                     // Reorganization
-                    // Reorganize both armies based on the outcome of the battle
-                    // Apply any effects or changes to army status, such as merging or splitting units
                     currentPhase.NextSubStage();
                     break;
                 default:

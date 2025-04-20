@@ -6,70 +6,7 @@ using System.Linq;
 
 public static class Util
 {
-    public static int Next(int minValue, int maxValue)
-    {
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            int range = maxValue - minValue;
-            int mask = range;
-            mask |= mask >> 1;
-            mask |= mask >> 2;
-            mask |= mask >> 4;
-            mask |= mask >> 8;
-            mask |= mask >> 16;
 
-            while (true)
-            {
-                byte[] randomNumber = new byte[4];
-                rng.GetBytes(randomNumber);
-                int value = BitConverter.ToInt32(randomNumber, 0) & mask;
-                if (value < range)
-                    return value + minValue;
-            }
-        }
-    }
-
-
-    public static float NextFloat(float minValue, float maxValue)
-    {
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            byte[] randomNumber = new byte[4];
-            rng.GetBytes(randomNumber);
-            uint randomValue = BitConverter.ToUInt32(randomNumber, 0);
-            float normalizedValue = (float)randomValue / UInt32.MaxValue; // Normalize the value to the range [0, 1]
-            return (maxValue - minValue) * normalizedValue + minValue;
-        }
-    }
-
-    public static string GetOrdinalSuffix(int number)
-    {
-        int lastDigit = number % 10;
-        int lastTwoDigits = number % 100;
-
-        if (lastDigit == 1 && lastTwoDigits != 11)
-        {
-            return "st";
-        }
-        else if (lastDigit == 2 && lastTwoDigits != 12)
-        {
-            return "nd";
-        }
-        else if (lastDigit == 3 && lastTwoDigits != 13)
-        {
-            return "rd";
-        }
-        else
-        {
-            return "th";
-        }
-    }
-
-    public static string GetPluralSuffix(int number)
-    {
-        if (number > 1 || number == 0) return "ies";
-        else return "y";
-    }
     public static List<string> ReadWordsFromFile(string filePath)
     {
         if (!File.Exists(filePath))
@@ -80,13 +17,56 @@ public static class Util
         return File.ReadAllLines(filePath).ToList();
     }
 
+    private static Random rng = new Random();
+
+    public static int Next(int min, int max) => rng.Next(min, max);
+    public static float NextFloat(float min, float max) => (float)(rng.NextDouble() * (max - min) + min);
+
+    public static string GetOrdinalSuffix(int num)
+    {
+        if (num % 100 >= 11 && num % 100 <= 13)
+            return "th";
+        int comp = num % 10; 
+        return comp switch
+        {
+            1 => "st",
+            2 => "nd",
+            3 => "rd",
+            _ => "th"
+        };
+    }
+
+    public static string GetPluralSuffix(int count) => count == 1 ? "y" : "ies";
+
+    public static string GetRandomCloneRank()
+    {
+        string[] ranks = { "Private", "Corporal", "Sergeant", "Lieutenant", "Captain" };
+        return ranks[Next(0, ranks.Length)];
+    }
+
+    public static string GetRandomDroidDesignation()
+    {
+        string[] designations = { "Commander", "Security", "Standard", "Tactical" };
+        return designations[Next(0, designations.Length)];
+    }
+
+    public static string GetRandomDroidType()
+    {
+        string[] types = { "B1 Battle Droid", "B2 Super Battle Droid", "Tactical Droid", "Commando Droid" };
+        return types[Next(0, types.Length)];
+    }
+
     public static string GetRandomWord(List<string> words)
     {
-        if (words == null || words.Count == 0)
-        {
-            throw new ArgumentException("Words list is empty or null.");
-        }
+        return words[Next(0, words.Count)];
+    }
+
+    public static string GetUniqueWord(List<string> words)
+    {
+        if (words.Count == 0) return "Unnamed";
         int index = Next(0, words.Count);
-        return words[index];
+        string word = words[index];
+        words.RemoveAt(index);
+        return word;
     }
 }

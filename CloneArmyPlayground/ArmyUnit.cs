@@ -7,25 +7,10 @@ public abstract class ArmyUnit
     public string Name { get; set; }
     public List<ArmyUnit> Subdivisions { get; set; }
 
-    public virtual int Manpower
-    {
-        get { return Subdivisions.Sum(unit => unit.Manpower); }
-    }
-
-    public virtual double ArmySkill
-    {
-        get { return Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmySkill); }
-    }
-
-    public virtual double ArmyMorale
-    {
-        get { return Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmyMorale); }
-    }
-
-    public virtual double ArmyDiscipline
-    {
-        get { return Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmyDiscipline); }
-    }
+    public virtual int Manpower => Subdivisions.Sum(unit => unit.Manpower);
+    public virtual double ArmySkill => Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmySkill);
+    public virtual double ArmyMorale => Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmyMorale);
+    public virtual double ArmyDiscipline => Subdivisions.Count == 0 ? 0 : Subdivisions.Average(unit => unit.ArmyDiscipline);
 
     public ArmyUnit(string name)
     {
@@ -33,78 +18,43 @@ public abstract class ArmyUnit
         Subdivisions = new List<ArmyUnit>();
     }
 
-    public void AddSubdivision(ArmyUnit unit)
-    {
-        Subdivisions.Add(unit);
-    }
-
-    public void RemoveSubdivision(ArmyUnit unit)
-    {
-        Subdivisions.Remove(unit);
-    }
+    public void AddSubdivision(ArmyUnit unit) => Subdivisions.Add(unit);
+    public void RemoveSubdivision(ArmyUnit unit) => Subdivisions.Remove(unit);
 }
 
+public class Corps : ArmyUnit { public Corps(string name) : base(name) { } }
+public class Brigade : ArmyUnit { public Brigade(string name) : base(name) { } }
+public class Regiment : ArmyUnit { public Regiment(string name) : base(name) { } }
+public class Vanguard : ArmyUnit { public Vanguard(string name) : base(name) { } }
+public class Battalion : ArmyUnit { public Battalion(string name) : base(name) { } }
+public class Company : ArmyUnit { public Company(string name) : base(name) { } }
+public class Platoon : ArmyUnit { public Platoon(string name) : base(name) { } }
+public class Squad : ArmyUnit { public Squad(string name) : base(name) { } }
 
-public class Corps : ArmyUnit
+public class Soldier : ArmyUnit
 {
-    public Corps(string name) : base(name) { }
-}
+    public string Rank { get; set; }
+    public string Identifier { get; set; }
+    public string Type { get; set; }
+    public string Nickname { get; set; }
+    public double Skill { get; set; }
+    public double Morale { get; set; }
+    public double Discipline { get; set; }
 
-public class Battalion : ArmyUnit
-{
-    public Battalion(string name) : base(name) { }
-}
+    public override int Manpower => 1;
+    public override double ArmySkill => Skill;
+    public override double ArmyMorale => Morale;
+    public override double ArmyDiscipline => Discipline;
 
-public class Company : ArmyUnit
-{
-    public Company(string name) : base(name) { }
-}
-
-public class Platoon : ArmyUnit
-{
-    public Platoon(string name) : base(name) { }
-}
-
-public class Squad : ArmyUnit
-{
-    private int _manpower;
-    private double _armySkill;
-    private double _armyMorale;
-    private double _armyDiscipline;
-
-    public override int Manpower
+    public Soldier(string name, string rank, string identifier, string type, double skill, double morale, double discipline, string nickname = null)
+        : base(name)
     {
-        get { return _manpower; }
-    }
-
-    public override double ArmySkill
-    {
-        get { return _armySkill; }
-    }
-
-    public override double ArmyMorale
-    {
-        get { return _armyMorale; }
-    }
-
-    public override double ArmyDiscipline
-    {
-        get { return _armyDiscipline; }
-    }
-
-    public Squad(string name, int manpower, double skill, double morale, double discipline) : base(name)
-    {
-        _manpower = manpower;
-        _armySkill = skill;
-        _armyMorale = morale;
-        _armyDiscipline = discipline;
-    }
-
-    public void UpdateManpower(int newManpower)
-    {
-        _manpower = newManpower;
+        Rank = rank;
+        Identifier = identifier;
+        Type = type;
+        Skill = skill;
+        Morale = morale;
+        Discipline = discipline;
+        Nickname = nickname;
     }
 }
-
-
-
